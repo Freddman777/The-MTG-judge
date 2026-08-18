@@ -17,7 +17,7 @@ No build step, no dependencies, no server. One file, open it and go.
 
 ## Usage
 
-**Locally:** download `mtg-referee.html` and open it in any modern browser. That's it.
+**Locally:** download `index.html` and open it in any modern browser. That's it.
 
 ## Built with
 
