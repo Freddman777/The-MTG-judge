@@ -19,18 +19,6 @@ No build step, no dependencies, no server. One file, open it and go.
 
 **Locally:** download `mtg-referee.html` and open it in any modern browser. That's it.
 
-**Hosted (GitHub Pages):**
-
-1. Push this repo to GitHub.
-2. Go to **Settings → Pages → Build and deployment → Source: Deploy from a branch**, pick `main` / `root`, and Save.
-3. After a minute it's live at:
-
-```
-https://<your-username>.github.io/<repo-name>/mtg-referee.html
-```
-
-> Tip: rename `mtg-referee.html` to `index.html` for a clean URL with no filename on the end.
-
 ## Built with
 
 Plain HTML, CSS, and vanilla JavaScript — no frameworks or libraries. Typography uses Google Fonts (Spectral, Inter, JetBrains Mono); the tool still works if those fail to load.
@@ -42,7 +30,3 @@ Every entry is written in plain language to explain how the rules function — i
 This is a study and quick-reference aid, **not** a substitute for the Comprehensive Rules or a certified judge for tournament rulings. For unusual card-specific interactions, check the card's Oracle text and Gatherer rulings.
 
 Magic: The Gathering is a trademark of Wizards of the Coast LLC. This project is unofficial and not affiliated with, endorsed, or sponsored by Wizards of the Coast.
-
-## License
-
-_No license is set. Add one (for example, [MIT](https://choosealicense.com/licenses/mit/)) if you want to let others reuse it — without a license, default copyright applies._
