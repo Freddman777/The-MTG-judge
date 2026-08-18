@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Judge's Bench — MTG Rules Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0d0e13;
+    --panel:#171922;
+    --panel-2:#1e2130;
+    --line:#2b2e3d;
+    --gold:#c9a85c;
+    --gold-dim:#8f7a44;
+    --text:#e9e6dd;
+    --muted:#9a97a6;
+    --faint:#6c6a78;
+
+    --c-types:#c9a85c;
+    --c-zones:#5b8dbe;
+    --c-phases:#d08a3c;
+    --c-core:#9a7bc8;
+    --c-combat:#c85a45;
+    --c-keywords:#5fa25f;
+    --c-actions:#4fa5a0;
+    --c-commander:#c06a8e;
+    --c-formats:#8892a0;
+
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 500px at 50% -200px, rgba(201,168,92,0.08), transparent 60%),
+      var(--ink);
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:0 20px 80px;}
+
+  /* Header */
+  header{
+    position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg, rgba(13,14,19,0.98) 60%, rgba(13,14,19,0.86));
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    padding-top:22px;
+  }
+  .header-inner{max-width:900px;margin:0 auto;padding:0 20px 14px;}
+  .brandline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+  h1{
+    font-family:'Spectral',Georgia,serif;
+    font-weight:600;
+    font-size:clamp(26px,4.5vw,38px);
+    letter-spacing:0.5px;
+    margin:0;
+    color:var(--text);
+  }
+  h1 .the{color:var(--gold);}
+  .subtitle{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:2px;text-transform:uppercase;
+    color:var(--faint);margin-top:2px;
+  }
+  .pips{display:flex;gap:5px;margin-left:auto;align-self:center;}
+  .pip{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.35);}
+  .pip.w{background:#f4efd8;}
+  .pip.u{background:#4a7db5;}
+  .pip.b{background:#3a3550;}
+  .pip.r{background:#c05340;}
+  .pip.g{background:#5c8a4e;}
+
+  /* Search */
+  .searchbox{position:relative;margin-top:16px;}
+  .searchbox input{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:17px;
+    color:var(--text);
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 44px 14px 44px;
+    outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .searchbox input:focus{
+    border-color:var(--gold-dim);
+    box-shadow:0 0 0 3px rgba(201,168,92,0.15);
+  }
+  .searchbox input::placeholder{color:var(--faint);}
+  .search-ico{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:16px;pointer-events:none;}
+  .clear-btn{
+    position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    background:none;border:none;color:var(--faint);cursor:pointer;
+    font-size:18px;padding:6px;line-height:1;border-radius:6px;display:none;
+  }
+  .clear-btn:hover{color:var(--text);background:var(--panel-2);}
+  .clear-btn.show{display:block;}
+
+  /* Filter chips */
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;}
+  .chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:0.5px;
+    padding:5px 10px;border-radius:20px;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    transition:all .12s;user-select:none;
+  }
+  .chip:hover{border-color:var(--faint);color:var(--text);}
+  .chip.active{color:var(--ink);font-weight:500;}
+  .chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+
+  .count{
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);
+    margin-top:16px;letter-spacing:1px;text-transform:uppercase;
+  }
+
+  /* Results */
+  .results{margin-top:6px;}
+  .entry{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--faint);
+    border-radius:var(--radius);
+    margin-top:12px;overflow:hidden;
+  }
+  .entry-head{
+    display:flex;align-items:center;gap:12px;
+    padding:15px 18px;cursor:pointer;user-select:none;
+  }
+  .entry-head:hover{background:var(--panel-2);}
+  .term{
+    font-family:'Spectral',Georgia,serif;
+    font-size:20px;font-weight:600;color:var(--text);
+    line-height:1.2;
+  }
+  .cat-tag{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.5px;
+    text-transform:uppercase;padding:3px 8px;border-radius:5px;white-space:nowrap;
+    background:rgba(255,255,255,0.05);
+  }
+  .summary{color:var(--muted);font-size:14px;flex:1;min-width:0;}
+  @media(max-width:620px){.summary{display:none;}}
+  .caret{color:var(--faint);font-size:13px;transition:transform .18s;flex-shrink:0;}
+  .entry.open .caret{transform:rotate(90deg);}
+
+  .entry-body{
+    display:none;
+    padding:2px 18px 20px;
+    border-top:1px solid var(--line);
+    margin-top:-1px;
+  }
+  .entry.open .entry-body{display:block;animation:fade .2s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(-3px);}to{opacity:1;transform:none;}}
+
+  .field{margin-top:15px;}
+  .field-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--gold);margin-bottom:5px;
+  }
+  .field-body{font-size:15px;color:#dcd9d0;}
+  .field-body strong{color:var(--text);font-weight:600;}
+  .field-body em{color:var(--gold);font-style:normal;}
+  .field-body a.xref{color:var(--gold);cursor:pointer;text-decoration:none;border-bottom:1px dotted rgba(201,168,92,0.5);transition:border-color .1s,color .1s;}
+  .field-body a.xref:hover{color:#e6cd88;border-bottom:1px solid rgba(201,168,92,0.9);}
+
+  .meta{
+    display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;
+    padding-top:14px;border-top:1px dashed var(--line);
+  }
+  .rule-ref{
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--faint);
+  }
+  .rule-ref b{color:var(--muted);font-weight:500;}
+  .related{font-size:13px;color:var(--muted);}
+  .related a{color:var(--c-zones);cursor:pointer;text-decoration:none;border-bottom:1px dotted rgba(91,141,190,0.5);}
+  .related a:hover{color:#7fb0e0;}
+
+  .empty{
+    text-align:center;padding:60px 20px;color:var(--faint);
+  }
+  .empty .big{font-family:'Spectral',serif;font-size:22px;color:var(--muted);margin-bottom:8px;}
+
+  footer{
+    margin-top:40px;padding-top:20px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--faint);line-height:1.6;
+  }
+  footer b{color:var(--muted);font-weight:500;}
+
+  mark{background:rgba(201,168,92,0.28);color:inherit;border-radius:2px;padding:0 1px;}
+
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brandline">
+      <div>
+        <h1><span class="the">The</span> Judge's Bench</h1>
+        <div class="subtitle">Magic: The Gathering · Rules Reference</div>
+      </div>
+      <div class="pips" aria-hidden="true">
+        <span class="pip w"></span><span class="pip u"></span><span class="pip b"></span><span class="pip r"></span><span class="pip g"></span>
+      </div>
+    </div>
+    <div class="searchbox">
+      <span class="search-ico">⌕</span>
+      <input id="search" type="text" autocomplete="off" spellcheck="false"
+        placeholder="Search a rule, keyword, or term — e.g. instant, trample, priority, commander damage" aria-label="Search rules">
+      <button class="clear-btn" id="clear" aria-label="Clear search">✕</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="count" id="count"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="results" id="results"></div>
+  <footer>
+    <b>How this works:</b> every entry is written in plain language to explain how a rule functions, when it applies, and why it matters — not copied from Wizards' Comprehensive Rules. Rule-section numbers point you to the official text for the precise wording.<br><br>
+    <b>Not a substitute for the Comprehensive Rules or a certified judge</b> for tournament rulings. For unusual card-specific interactions, check the card's Oracle text and Gatherer rulings. Ask me directly for any interaction not covered here.
+  </footer>
+</div>
+
+<script>
+const CATS = {
+  types:      {label:'Card Types',   color:'var(--c-types)'},
+  zones:      {label:'Zones',        color:'var(--c-zones)'},
+  phases:     {label:'Turns & Phases',color:'var(--c-phases)'},
+  core:       {label:'Core Rules',   color:'var(--c-core)'},
+  combat:     {label:'Combat',       color:'var(--c-combat)'},
+  keywords:   {label:'Keywords',     color:'var(--c-keywords)'},
+  actions:    {label:'Actions',      color:'var(--c-actions)'},
+  commander:  {label:'Commander',    color:'var(--c-commander)'},
+  formats:    {label:'Formats',      color:'var(--c-formats)'}
+};
+
+const DATA = [
+/* ============ CARD TYPES ============ */
+{term:"Instant", cat:"types", alias:["instant speed"],
+ summary:"A spell you can cast almost any time, then it leaves for the graveyard.",
+ how:"An instant is a one-shot spell. When it resolves, its effect happens and the card goes to its owner's <em>graveyard</em> — it does not stay on the battlefield. \"Instant speed\" is shorthand for the timing an instant is allowed to be cast at.",
+ when:"Any time you have <em>priority</em> — during your turn or an opponent's, during any step or phase, and in response to other spells and abilities on the stack. This is what lets you react to what an opponent is doing.",
+ why:"Instant timing is the backbone of interaction: counterspells, combat tricks, and removal used at the right moment all rely on being castable during another player's turn or in response to something.",
+ related:["Sorcery","The Stack","Priority","Flash"], rule:"Type — 300 / Timing — 601"},
+
+{term:"Sorcery", cat:"types", alias:["sorcery speed"],
+ summary:"A one-shot spell you can only cast on your own turn with an empty stack.",
+ how:"Like an instant, a sorcery resolves once and then goes to the graveyard. The only difference is timing.",
+ when:"Only during <strong>your</strong> main phase, while you have priority and the <em>stack is empty</em>. You cannot cast it in response to anything or on an opponent's turn. \"Sorcery speed\" describes this restriction, and it also governs things like playing a land or casting most creatures.",
+ why:"The restriction is a balancing lever: powerful effects are often printed as sorceries so they can't be held up reactively.",
+ related:["Instant","Main Phase","The Stack"], rule:"Type — 300 / Timing — 307"},
+
+{term:"Creature", cat:"types",
+ summary:"A permanent that can attack and block; has power and toughness.",
+ how:"When a creature spell resolves it enters the <em>battlefield</em> as a permanent with a power (damage it deals) and toughness (damage it can take). It can attack, block, and use abilities.",
+ when:"Cast at sorcery speed unless it has flash. A creature can't attack or use tap abilities until it has been under your control since your most recent turn began — see <em>summoning sickness</em>.",
+ why:"Creatures are the primary way most decks deal damage and defend, which is why summoning sickness and combat rules exist to pace them.",
+ related:["Summoning Sickness","Combat","Power / Toughness","Flash"], rule:"Type — 302"},
+
+{term:"Artifact", cat:"types",
+ summary:"A colorless-by-default permanent representing an item, construct, or device.",
+ how:"An artifact enters the battlefield and stays until removed. Most are noncreature permanents (mana rocks, equipment, gadgets), but Artifact Creatures are both types at once and can attack and block.",
+ when:"Cast at sorcery speed unless it has flash. Artifact abilities work like any other permanent's.",
+ why:"Because artifacts are usually colorless, any deck can play them — which is why 'artifact hate' exists as a catch-all answer.",
+ related:["Equipment","Vehicle","Creature"], rule:"Type — 301"},
+
+{term:"Enchantment", cat:"types",
+ summary:"A permanent representing a lasting magical effect.",
+ how:"An enchantment stays on the battlefield providing an ongoing effect. Auras are enchantments that attach to something; Sagas are enchantments that advance through chapters.",
+ when:"Cast at sorcery speed unless it has flash.",
+ why:"Enchantments provide persistent value that's historically hard to remove, which shapes how removal is designed around them.",
+ related:["Aura","Saga","Static Ability"], rule:"Type — 303"},
+
+{term:"Planeswalker", cat:"types", alias:["walker","superfriends"],
+ summary:"A permanent ally with loyalty and loyalty abilities.",
+ how:"A planeswalker enters with starting <em>loyalty counters</em>. Once per turn, on your turn with an empty stack (sorcery timing), you may activate <strong>one</strong> of its loyalty abilities — adding or removing loyalty as shown. If its loyalty hits 0, it's put into the graveyard.",
+ when:"Loyalty abilities: sorcery speed, one per planeswalker per turn. Opponents can attack a planeswalker; combat damage removes that many loyalty counters.",
+ why:"The one-ability-per-turn limit and the ability to attack them keep planeswalkers from snowballing unchecked.",
+ related:["Loyalty","Legend Rule","Combat"], rule:"Type — 306"},
+
+{term:"Land", cat:"types",
+ summary:"Your mana engine; played, not cast.",
+ how:"Lands produce mana via mana abilities. You <em>play</em> a land — it doesn't use the stack and can't be countered like a spell.",
+ when:"One land per turn, only during your main phase with an empty stack, unless an effect grants extra land drops.",
+ why:"The one-land-per-turn rule is Magic's core resource pace. Because lands aren't spells, they resolve instantly and can't be responded to as they enter.",
+ related:["Mana","Mana Ability","Main Phase"], rule:"Type — 305"},
+
+{term:"Battle", cat:"types", alias:["siege"],
+ summary:"A shared permanent with defense counters that players attack to flip.",
+ how:"Battles (currently the Siege subtype) enter with <em>defense counters</em> and a protector. You attack a battle like a planeswalker to remove counters; at 0 it's exiled and the caster may cast its back face.",
+ when:"Cast at sorcery speed. Attacked during combat.",
+ why:"Battles add a new axis of combat targets and were designed to reward aggression from multiple players.",
+ related:["Combat","Planeswalker"], rule:"Type — 310"},
+
+{term:"Legendary", cat:"types", alias:["legend"],
+ summary:"A supertype that limits you to one copy in play at a time.",
+ how:"Legendary is a supertype on some permanents. See the <em>Legend Rule</em> for what happens when you control duplicates.",
+ when:"Checked continuously as a state-based action.",
+ why:"Keeps uniquely powerful characters and artifacts singular per controller.",
+ related:["Legend Rule","Commander"], rule:"Supertype — 205.4"},
+
+{term:"Token", cat:"types",
+ summary:"A permanent created by an effect, not represented by a card.",
+ how:"A token is a permanent created on the battlefield by a spell or ability. It has the characteristics its creator gives it.",
+ when:"Exists only on the battlefield. If a token ever leaves the battlefield, it goes to the appropriate zone momentarily and then ceases to exist as a state-based action.",
+ why:"Tokens let effects generate board presence without needing physical cards; the 'ceases to exist' rule stops them cluttering other zones.",
+ related:["State-Based Actions","Creature"], rule:"111"},
+
+{term:"Aura", cat:"types",
+ summary:"An enchantment that attaches to a permanent (or player).",
+ how:"An Aura is cast targeting what it will enchant; on resolution it enters attached. If what it enchants leaves, the Aura is put into the graveyard as a state-based action.",
+ when:"Sorcery speed unless it has flash. It must have a legal thing to enchant when cast.",
+ why:"Auras trade card economy for a bigger effect — a downside built in, since removing the host also removes the Aura.",
+ related:["Enchantment","Enchant","State-Based Actions"], rule:"303.4"},
+
+{term:"Equipment", cat:"types",
+ summary:"An artifact you attach to a creature you control via Equip.",
+ how:"Equipment enters unattached. You use its <em>Equip</em> ability to attach it to a creature you control, granting bonuses. If the creature leaves, the Equipment stays on the battlefield, unattached.",
+ when:"Equip is an activated ability usable only at sorcery speed (your turn, empty stack).",
+ why:"Unlike Auras, Equipment survives the loss of its creature, making it more resilient — balanced by the mana you re-pay to move it.",
+ related:["Equip","Artifact","Aura"], rule:"301.5"},
+
+{term:"Vehicle", cat:"types",
+ summary:"An artifact that becomes a creature when crewed.",
+ how:"A Vehicle is a noncreature artifact until you <em>Crew</em> it. Crewing turns it into an artifact creature until end of turn so it can attack or block.",
+ when:"Crew can be activated any time you could cast an instant, but a just-crewed Vehicle still needs to have been under your control since your turn began to attack (summoning sickness applies to the permanent, not the crew action).",
+ why:"Vehicles dodge sorcery-speed creature removal while sitting uncrewed, adding a timing puzzle for both players.",
+ related:["Crew","Artifact","Summoning Sickness"], rule:"301.7"},
+
+{term:"Saga", cat:"types",
+ summary:"An enchantment that advances through chapters via lore counters.",
+ how:"A Saga enters with its first lore counter, then gains another as your precombat main phase begins each turn, triggering the matching chapter ability. After its final chapter resolves, it's sacrificed.",
+ when:"Chapter abilities are triggered abilities that use the stack.",
+ why:"Sagas tell a sequenced story mechanically, giving staged value that opponents can plan around.",
+ related:["Enchantment","Triggered Ability"], rule:"714"},
+
+/* ============ ZONES ============ */
+{term:"Library", cat:"zones", alias:["deck"],
+ summary:"Your face-down deck; a hidden, ordered zone.",
+ how:"Cards you draw come from the top of your library. Its order matters (scry, surveil, and tutors manipulate it) and its contents are hidden from all players.",
+ when:"You draw from it each turn and whenever an effect says to.",
+ why:"Running out of cards to draw is a loss condition (see decking / mill), making the library a resource you protect.",
+ related:["Draw Step","Mill","Scry","Surveil"], rule:"401"},
+
+{term:"Hand", cat:"zones",
+ summary:"The cards you're holding; hidden, with a 7-card limit at cleanup.",
+ how:"Your hand holds cards you can play. It's private to you.",
+ when:"During your <em>cleanup step</em>, if you have more than seven cards you discard down to seven (unless an effect changes your maximum).",
+ why:"The hand-size limit prevents unlimited card hoarding and forces decisions about what to keep.",
+ related:["Cleanup Step","Discard","Draw Step"], rule:"402"},
+
+{term:"Battlefield", cat:"zones", alias:["in play","board"],
+ summary:"Where permanents live and do their work.",
+ how:"Lands, creatures, artifacts, enchantments, planeswalkers, and battles exist here. It's shared and public — everyone sees it. Only permanents exist on the battlefield.",
+ when:"Permanents enter as they resolve or are created, and leave when destroyed, sacrificed, exiled, bounced, etc.",
+ why:"It's the only zone where a permanent's abilities generally function, so 'answers' aim to move things off it.",
+ related:["Permanent","State-Based Actions"], rule:"403"},
+
+{term:"Graveyard", cat:"zones", alias:["yard","bin"],
+ summary:"The discard/destroyed pile; face-up and ordered.",
+ how:"Destroyed, sacrificed, discarded, milled, and resolved instants/sorceries go here. It's public.",
+ when:"Cards arrive here constantly; many effects (flashback, escape, delve, reanimation) use it as a resource.",
+ why:"Because the graveyard is a working resource, not just a discard pile, 'graveyard hate' is a meaningful category of card.",
+ related:["Mill","Flashback","Exile"], rule:"404"},
+
+{term:"The Stack", cat:"zones", alias:["stack"],
+ summary:"Where spells and abilities wait to resolve — last in, first out.",
+ how:"When you cast a spell or activate an ability (except mana abilities), it goes on the stack. Players then get priority to respond by adding more on top. The stack resolves one object at a time from the <strong>top down</strong> (LIFO): the last thing added resolves first.",
+ when:"Any spell or non-mana ability uses it. It must be empty for a player to take a sorcery-speed action.",
+ why:"The stack is why responses work: because the newest thing resolves first, a counterspell cast <em>after</em> a spell resolves <em>before</em> it.",
+ related:["Priority","Instant","Resolve","Counter (a spell)"], rule:"405 / 608"},
+
+{term:"Exile", cat:"zones", alias:["removed from game","rfg"],
+ summary:"A holding zone that's usually a one-way trip.",
+ how:"Exiled cards are set aside, face-up unless stated. Unlike the graveyard, most effects can't retrieve them, so exile is the most permanent form of removal.",
+ when:"Effects that 'exile' send cards here; some let cards return (foretell, adventure, suspend, impulsive draw).",
+ why:"Exile bypasses death triggers and graveyard recursion, which is exactly why it's used to answer resilient threats.",
+ related:["Destroy","Graveyard","Indestructible"], rule:"406"},
+
+{term:"Command Zone", cat:"commander", alias:["command zone"],
+ summary:"Special zone for commanders, emblems, and a few mechanics.",
+ how:"In Commander, your commander starts here and can be cast from here. Emblems and cards with mechanics like Companion also live here.",
+ when:"You may cast your commander from the command zone; if it would go to graveyard or exile, you may instead return it here.",
+ why:"Keeping the commander accessible is the whole point of the format — but re-casting costs more each time (see command tax).",
+ related:["Commander","Command Tax","Commander Damage"], rule:"408 / 903"},
+
+/* ============ TURNS & PHASES ============ */
+{term:"Turn Structure", cat:"phases", alias:["phases","turn order"],
+ summary:"The five phases every turn runs through in order.",
+ how:"A turn proceeds: <strong>1) Beginning</strong> (untap, upkeep, draw) → <strong>2) Precombat Main</strong> → <strong>3) Combat</strong> (five steps) → <strong>4) Postcombat Main</strong> → <strong>5) Ending</strong> (end step, cleanup).",
+ when:"Every turn, in this fixed order. Players receive priority in most steps (untap and cleanup are exceptions).",
+ why:"A fixed sequence lets both players anticipate windows to act — e.g. holding removal for the declare-attackers step.",
+ related:["Main Phase","Combat","Upkeep","End Step","Priority"], rule:"500"},
+
+{term:"Untap Step", cat:"phases",
+ summary:"Untap your permanents; no one gets priority.",
+ how:"The active player untaps their tapped permanents simultaneously. Phasing and a few effects also happen here.",
+ when:"First step of your turn. Players do <strong>not</strong> receive priority, so nothing can be cast in response during untap.",
+ why:"No priority here prevents you from being interrupted mid-refresh, keeping the step clean.",
+ related:["Tap / Untap","Turn Structure"], rule:"502"},
+
+{term:"Upkeep", cat:"phases", alias:["upkeep step"],
+ summary:"First window for priority; many 'at the beginning of your upkeep' triggers fire.",
+ how:"After untap, the upkeep step begins. Triggered abilities that read 'at the beginning of your upkeep' go on the stack, then players get priority.",
+ when:"Right before your draw step.",
+ why:"It's the earliest reactive window of your turn and a common home for upkeep-cost and ticking effects.",
+ related:["Draw Step","Triggered Ability","Priority"], rule:"503"},
+
+{term:"Draw Step", cat:"phases",
+ summary:"You draw one card for the turn.",
+ how:"The active player draws a card as a turn-based action, then players get priority.",
+ when:"After upkeep. The player who goes first <em>skips</em> their first draw step in most formats (in Commander, everyone draws normally on their first turn unless it's a two-player pod).",
+ why:"The mandatory draw is the game's baseline card advantage; extra draws and skipped draws are meaningful swings.",
+ related:["Library","Upkeep","Card Advantage"], rule:"504"},
+
+{term:"Main Phase", cat:"phases", alias:["main phase","precombat","postcombat","first main","second main"],
+ summary:"Your window for sorcery-speed plays; happens twice per turn.",
+ how:"During a main phase, with an empty stack and priority, you can play a land and cast sorceries, creatures, artifacts, enchantments, and planeswalkers. There's a precombat main and a postcombat main.",
+ when:"Only on your turn, stack empty. Precombat main comes before combat; postcombat main after.",
+ why:"Splitting it around combat lets you decide whether to commit resources before attacking (bluffing) or hold them until after you see how combat goes.",
+ related:["Sorcery","Land","Combat","Priority"], rule:"505"},
+
+{term:"Combat Phase", cat:"combat", alias:["combat"],
+ summary:"The five-step sequence where creatures fight.",
+ how:"Combat runs: <strong>Beginning of Combat</strong> → <strong>Declare Attackers</strong> → <strong>Declare Blockers</strong> → <strong>Combat Damage</strong> → <strong>End of Combat</strong>.",
+ when:"Once per turn by default (some effects add combat phases). Priority is passed in each step, giving both players reaction windows.",
+ why:"Structuring combat into discrete steps creates the timing windows for tricks, removal, and blocks that make combat a real decision tree.",
+ related:["Declare Attackers","Declare Blockers","Combat Damage","First Strike"], rule:"506"},
+
+{term:"Declare Attackers", cat:"combat", alias:["attack step","attacking"],
+ summary:"The active player chooses attackers and taps them.",
+ how:"The attacking player picks which untapped, non-summoning-sick creatures attack and what each attacks (a player, planeswalker, or battle). Attacking taps them unless they have <em>vigilance</em>. 'Whenever ~ attacks' triggers fire now.",
+ when:"After beginning of combat. Once declared, both players get priority.",
+ why:"This is a key interaction window: the defender often waits until attackers are locked in before using removal or tricks.",
+ related:["Attacking","Vigilance","Menace","Summoning Sickness"], rule:"508"},
+
+{term:"Declare Blockers", cat:"combat", alias:["block step","blocking"],
+ summary:"The defending player assigns blockers.",
+ how:"The defender chooses which of their untapped creatures block which attackers. Each blocker can block one attacker (unless stated); multiple blockers can gang up on one attacker. Evasion (flying, menace, etc.) restricts what can block.",
+ when:"After attackers are declared. Then the attacker orders multiple blockers for damage assignment, and both players get priority before damage.",
+ why:"Blocking is the defender's main lever, and the ordering of blockers by the attacker sets up damage-assignment and trample math.",
+ related:["Blocking","Combat Damage","Trample","Menace","Flying"], rule:"509"},
+
+{term:"Combat Damage", cat:"combat", alias:["damage step","combat damage step"],
+ summary:"Attackers and blockers deal damage simultaneously.",
+ how:"All combat damage is dealt at once. Unblocked attackers hit their target; blocked attackers and their blockers deal damage to each other per the assignment order. Damage marked ≥ toughness destroys a creature via state-based action.",
+ when:"After blockers. If any creature has <em>first strike</em> or <em>double strike</em>, there are two damage steps — a first-strike step, then a regular step.",
+ why:"Simultaneous damage is why two creatures can trade and both die, and why combat math must account for everything happening at once.",
+ related:["First Strike","Double Strike","Deathtouch","Trample","State-Based Actions"], rule:"510"},
+
+{term:"End Step", cat:"phases", alias:["end of turn","eot"],
+ summary:"'At the beginning of your end step' triggers fire here.",
+ how:"After your postcombat main phase, the end step begins; matching triggers go on the stack and players get priority.",
+ when:"The last point of the turn where players normally act. A common window to do things 'at end of turn' so they're ready for your next turn.",
+ why:"Acting on an opponent's end step lets you use instant-speed effects with minimal downside, since your own turn follows.",
+ related:["Cleanup Step","Triggered Ability","Instant"], rule:"513"},
+
+{term:"Cleanup Step", cat:"phases", alias:["cleanup","discard to hand size"],
+ summary:"Discard to hand size and remove 'until end of turn' effects.",
+ how:"You discard down to your maximum hand size (normally 7), then all damage is removed from creatures and 'until end of turn' effects end. Normally no player gets priority.",
+ when:"The final step of the turn. Priority only happens if a triggered ability triggers or a state-based action occurs during cleanup, which can create an extra cleanup step.",
+ why:"This is why damage doesn't carry over between turns and why buffs like +3/+3 'until end of turn' wear off.",
+ related:["Hand","Discard","State-Based Actions"], rule:"514"},
+
+/* ============ CORE RULES ============ */
+{term:"Priority", cat:"core", alias:["who acts","passing priority"],
+ summary:"The right to take an action; it must be passed for the game to advance.",
+ how:"At most points, one player has priority and may cast spells / activate abilities or pass. After a player acts, priority is passed around. When <strong>all</strong> players pass in succession with the stack empty, the game moves to the next step; if the stack isn't empty, the top object resolves and the active player gets priority again.",
+ when:"You generally can't do anything without priority. The active player receives it first in each step (after triggers are put on the stack).",
+ why:"Priority is the engine that sequences every interaction — it's precisely why players can respond to each other in an orderly way.",
+ related:["The Stack","Instant","APNAP","Resolve"], rule:"117 / 405"},
+
+{term:"Casting a Spell", cat:"core", alias:["cast","casting"],
+ summary:"The step-by-step process of putting a spell on the stack.",
+ how:"Casting follows a set sequence: move the card to the stack, choose modes and targets, determine total cost, then pay it. Once cast, the spell is on the stack and can be responded to. If any step can't be legally completed, the whole cast is reversed.",
+ when:"At the timing the spell's type allows (instant speed vs sorcery speed), when you have priority.",
+ why:"Because targets and costs are locked in when a spell is cast — not when it resolves — opponents get a clear window to respond before anything happens.",
+ related:["The Stack","Priority","Target","Mana"], rule:"601"},
+
+{term:"Activated Ability", cat:"core", alias:["activate","tap ability"],
+ summary:"A 'cost: effect' ability you can turn on yourself.",
+ how:"Written as <em>[cost]: [effect]</em> (e.g. '{T}: Add {G}'). You pay the cost and put the ability on the stack; it resolves like a spell.",
+ when:"Any time you have priority, unless the ability says otherwise or is restricted (e.g. Equip is sorcery-speed). Abilities with {T} need a permanent that isn't summoning-sick if it's a creature tapping for the ability.",
+ why:"Activated abilities are repeatable interaction that don't require casting a spell, which is why they dodge counterspells aimed at spells.",
+ related:["Mana Ability","Triggered Ability","The Stack","Priority"], rule:"602"},
+
+{term:"Triggered Ability", cat:"core", alias:["trigger","when whenever at"],
+ summary:"An ability that fires on its own when a condition is met.",
+ how:"Starts with 'when,' 'whenever,' or 'at.' When its event happens, it triggers and is put on the stack the next time a player would receive priority — its controller doesn't choose to use it.",
+ when:"Automatically, whenever the trigger condition occurs. Multiple triggers use APNAP ordering.",
+ why:"Because triggers go on the stack, they can be responded to — and because they fire automatically, forgetting one is a real risk at the table.",
+ related:["Activated Ability","The Stack","APNAP","Priority"], rule:"603"},
+
+{term:"Static Ability", cat:"core", alias:["static","passive"],
+ summary:"An always-on effect that doesn't use the stack.",
+ how:"Static abilities are continuously true while the source is present (e.g. 'Creatures you control get +1/+1'). They don't trigger and can't be responded to — they simply apply.",
+ when:"Constantly, as long as the source and its condition exist.",
+ why:"Since they never use the stack, you can't counter a static effect; you have to remove its source.",
+ related:["Layers","Replacement Effect","Continuous Effect"], rule:"604"},
+
+{term:"State-Based Actions", cat:"core", alias:["sba","sbas","state based"],
+ summary:"Automatic checks the game makes constantly (like creatures dying).",
+ how:"Before any player gets priority, the game checks a list of conditions and acts on them all at once: a creature with lethal damage or 0 toughness is destroyed/put in graveyard, a player at 0 life loses, an Aura with nothing to enchant is put in the graveyard, the legend rule and token 'ceases to exist,' etc. This repeats until nothing is pending.",
+ when:"Whenever a player would receive priority — not on the stack, and they can't be responded to.",
+ why:"SBAs are why creatures die instantly to enough damage without anyone 'doing' anything, and why you can't respond to a creature dying from damage.",
+ related:["Priority","Legend Rule","Deathtouch","Token"], rule:"704"},
+
+{term:"Replacement Effect", cat:"core", alias:["instead","replacement","as enters"],
+ summary:"An effect that changes how an event happens, using 'instead' or 'as.'",
+ how:"A replacement effect watches for an event and modifies it before it happens (e.g. 'If you would draw, instead...' or 'enters with two +1/+1 counters'). It doesn't use the stack and applies only once to a given event.",
+ when:"At the moment the event it replaces would occur. If several could apply, the affected player/controller chooses the order.",
+ why:"Because they alter the event itself, replacement effects can't be responded to — they're a quiet but powerful way to bend the rules.",
+ related:["Static Ability","Layers","Prevention"], rule:"614 / 616"},
+
+{term:"Layers", cat:"core", alias:["layer system","continuous effects","layer 7"],
+ summary:"The order continuous effects are applied to determine an object's characteristics.",
+ how:"When multiple continuous effects affect an object, they apply in a fixed order: <strong>1</strong> copy, <strong>2</strong> control, <strong>3</strong> text, <strong>4</strong> type, <strong>5</strong> color, <strong>6</strong> abilities, <strong>7</strong> power/toughness. Layer 7 has sublayers: set-P/T effects apply before <em>counters</em>, which apply before +X/+X or −X/−X modifications, then power/toughness switches.",
+ when:"Recalculated continuously whenever characteristics need to be known.",
+ why:"The layer order settles otherwise-paradoxical interactions — for example, +1/+1 counters (7c) always apply before a spell's +X/+X pump (7d), and a 'becomes a 0/1' effect can wipe out other buffs if it sets after them.",
+ related:["Static Ability","Replacement Effect","Counters (+1/+1)","Power / Toughness"], rule:"613"},
+
+{term:"Mana", cat:"core", alias:["mana pool","wubrg","colorless mana"],
+ summary:"The resource you spend to cast spells and pay costs.",
+ how:"Mana comes in five colors — White {W}, Blue {U}, Black {B}, Red {R}, Green {G} — plus generic {1},{2}… (payable by any mana) and colorless {C}. You produce it into your mana pool, usually from lands.",
+ when:"Produced when you need it; unspent mana empties at the end of each step and phase.",
+ why:"The color pie is Magic's identity system — what each color can and can't do drives deckbuilding and the whole game's balance.",
+ related:["Mana Ability","Land","Mana Value","Color Identity"], rule:"106"},
+
+{term:"Mana Ability", cat:"core", alias:["mana abilities"],
+ summary:"An ability that makes mana and doesn't use the stack.",
+ how:"An activated ability that could add mana and has no target (like a land's '{T}: Add {W}') is a mana ability. It resolves immediately without going on the stack.",
+ when:"Any time you have priority or are in the middle of paying a cost.",
+ why:"Because mana abilities don't use the stack, you can tap for mana mid-cast without giving opponents a response window — and they can't be countered.",
+ related:["Mana","Activated Ability","The Stack"], rule:"605"},
+
+{term:"Summoning Sickness", cat:"core", alias:["summoning sick","haste sickness"],
+ summary:"A fresh creature can't attack or use tap abilities right away.",
+ how:"A creature can attack, or activate abilities with the {T} or {Q} symbol, only if it has been under <strong>your</strong> control continuously since your most recent turn began.",
+ when:"Applies the turn a creature enters or changes controllers. It does <strong>not</strong> stop the creature from blocking or from using abilities that don't require tapping/untapping.",
+ why:"It gives opponents a turn to answer a new threat before it can swing, which is exactly what <em>haste</em> bypasses.",
+ related:["Haste","Creature","Vigilance"], rule:"302.6"},
+
+{term:"APNAP", cat:"core", alias:["ap nap","active player nonactive player"],
+ summary:"Ordering rule: Active Player, then Non-Active Player.",
+ how:"When multiple triggered abilities go on the stack at once, or players make simultaneous choices, the active player's are put on the stack / chosen first, then each nonactive player's in turn order. Because the stack is LIFO, the active player's triggers actually resolve <em>last</em>.",
+ when:"Any time several things happen simultaneously and need an order.",
+ why:"APNAP removes ambiguity about who does what first when everything triggers at the same moment.",
+ related:["The Stack","Triggered Ability","Priority"], rule:"101.4 / 603.3b"},
+
+{term:"Resolve", cat:"core", alias:["resolution","resolving"],
+ summary:"What happens when a spell or ability actually takes effect.",
+ how:"When all players pass priority, the top object of the stack resolves: its instructions are followed in order. If every target has become illegal, it's countered by the game rules and doesn't resolve; if some targets are still legal, it does as much as it can.",
+ when:"After priority is passed by all players with that object on top.",
+ why:"The gap between casting and resolving is the whole reason interaction exists — things can change before a spell resolves.",
+ related:["The Stack","Priority","Target","Counter (a spell)"], rule:"608"},
+
+{term:"Power / Toughness", cat:"core", alias:["power","toughness","p/t"],
+ summary:"A creature's damage output and damage capacity.",
+ how:"Written as power/toughness (e.g. 3/2): power is combat damage dealt, toughness is how much damage it survives. A creature with toughness 0 or less is put into the graveyard; one with damage marked ≥ its toughness is destroyed.",
+ when:"Checked continuously via state-based actions; modified through the layer system.",
+ why:"Nearly all combat and removal math reduces to these two numbers, so understanding how effects modify them (via layers) is core to play.",
+ related:["Layers","Counters (+1/+1)","Combat Damage","Deathtouch"], rule:"208 / 302"},
+
+{term:"Counters (+1/+1)", cat:"core", alias:["plus one counter","minus counters","loyalty counter","counter on permanent"],
+ summary:"Markers placed on permanents (distinct from countering a spell).",
+ how:"A counter is a marker on a permanent or player — +1/+1 and −1/−1 change power/toughness, loyalty runs planeswalkers, and many others exist. +1/+1 and −1/−1 counters on the same creature cancel out in pairs as a state-based action.",
+ when:"Placed and removed by effects; +1/+1 counters apply in layer 7c, before spell/ability P/T changes.",
+ why:"Counters are permanent (they stick around unlike 'until end of turn' buffs), which makes counter-based strategies resilient.",
+ related:["Layers","Power / Toughness","State-Based Actions","Counter (a spell)"], rule:"122"},
+
+{term:"Copy", cat:"core", alias:["copying","token copy"],
+ summary:"A duplicate of a spell, ability, or permanent's copiable values.",
+ how:"A copy uses the original's <em>copiable characteristics</em> (its printed values plus certain copy/type-changing effects) — not counters, Auras/Equipment, or most 'until end of turn' effects. A copied spell goes on the stack; a copied permanent is usually a token.",
+ when:"Whenever an effect says to copy something.",
+ why:"Knowing what does and doesn't get copied (e.g. counters and attached Auras don't) settles most 'clone' interactions.",
+ related:["Token","Layers","Static Ability"], rule:"707"},
+
+/* ============ COMBAT DETAILS ============ */
+{term:"Attacking", cat:"combat", alias:["attacker","swing"],
+ summary:"Sending creatures at a player, planeswalker, or battle.",
+ how:"During declare attackers, you choose eligible creatures and what each attacks. They tap unless they have vigilance. An attacker stays 'attacking' through combat even if what it attacks changes or leaves.",
+ when:"Only creatures untapped and free of summoning sickness (or with haste) can be declared as attackers.",
+ why:"Committing attackers is a tempo decision — tapped creatures usually can't block on the crack-back.",
+ related:["Declare Attackers","Vigilance","Blocking","Menace"], rule:"508"},
+
+{term:"Blocking", cat:"combat", alias:["blocker","gang block","double block"],
+ summary:"Assigning your creatures to stop attackers.",
+ how:"The defender declares blocks. A creature can normally block one attacker; several creatures can block the same attacker (a gang block). Tapped creatures can't block. Evasion abilities limit legal blocks.",
+ when:"During declare blockers. Removing a blocker after it's declared still leaves the attacker 'blocked' unless an effect says otherwise.",
+ why:"Once a creature is blocked, it deals no damage to the defending player even if the blocker dies — a key subtlety behind 'blocked but no blocker' situations.",
+ related:["Declare Blockers","Flying","Reach","Menace","Trample"], rule:"509"},
+
+{term:"Trample", cat:"keywords", alias:["trample over"],
+ summary:"Excess combat damage carries past blockers to the player.",
+ how:"When a creature with trample is blocked, its controller assigns <strong>lethal</strong> damage to the blockers, then may assign the rest to the player, planeswalker, or battle it's attacking. 'Lethal' means enough to equal each blocker's toughness minus damage already on it — or just <strong>1</strong> if the attacker also has <em>deathtouch</em>.",
+ when:"During combat damage assignment, only while blocked.",
+ why:"Trample turns chump-blocking from a full stop into a speed bump; combined with deathtouch it becomes brutal, since 1 damage per blocker is 'lethal.'",
+ related:["Deathtouch","Combat Damage","Blocking"], rule:"702.19"},
+
+{term:"Deathtouch", cat:"keywords", alias:["death touch"],
+ summary:"Any amount of damage from it is lethal.",
+ how:"Any nonzero amount of damage a source with deathtouch deals to a creature is treated as lethal — that creature is destroyed as a state-based action.",
+ when:"Whenever the deathtouch source deals combat or noncombat damage.",
+ why:"It makes even a 1/1 a real threat and trades up against big creatures; with trample it lets the attacker assign just 1 per blocker and trample the rest.",
+ related:["Trample","First Strike","Combat Damage","State-Based Actions"], rule:"702.2"},
+
+/* ============ KEYWORDS ============ */
+{term:"Flying", cat:"keywords",
+ summary:"Can only be blocked by creatures with flying or reach.",
+ how:"A creature with flying can attack over the ground; only creatures that also have flying (or have reach) may block it. Flyers can block anything.",
+ when:"During declare blockers.",
+ why:"Flying is Magic's most common evasion, which is why reach exists as the dedicated answer.",
+ related:["Reach","Blocking","Menace"], rule:"702.9"},
+
+{term:"Reach", cat:"keywords",
+ summary:"Can block creatures with flying.",
+ how:"A creature with reach can block flyers as if it had flying. It gains no other benefit and isn't harder to block itself.",
+ when:"During declare blockers.",
+ why:"Reach is the ground creature's answer to flyers without granting evasion of its own.",
+ related:["Flying","Blocking"], rule:"702.17"},
+
+{term:"First Strike", cat:"keywords",
+ summary:"Deals combat damage before creatures without it.",
+ how:"If any creature in combat has first strike (or double strike), there's an extra combat damage step first. First strikers deal their damage then; if that kills a normal creature, it never deals its damage back.",
+ when:"During the first-strike combat damage step.",
+ why:"First strike lets a creature win fights without taking damage in return, and pairs with deathtouch to kill before the opponent can respond in damage.",
+ related:["Double Strike","Deathtouch","Combat Damage"], rule:"702.7"},
+
+{term:"Double Strike", cat:"keywords",
+ summary:"Deals both first-strike and regular combat damage.",
+ how:"A creature with double strike deals damage in the first-strike step <strong>and</strong> the normal step — effectively hitting twice per combat.",
+ when:"Across both combat damage steps.",
+ why:"It roughly doubles a creature's combat output and stacks powerfully with lifelink, trample, and +X/+X buffs.",
+ related:["First Strike","Lifelink","Trample","Combat Damage"], rule:"702.4"},
+
+{term:"Lifelink", cat:"keywords", alias:["life link"],
+ summary:"Damage it deals also gains you that much life.",
+ how:"Whenever a source with lifelink deals damage (combat or otherwise), its controller gains that much life. It's a static ability — the life gain happens as part of the damage event, not as a separate trigger.",
+ when:"Any time the source deals damage.",
+ why:"Because it isn't a trigger, the life gain can't be responded to before it happens; with double strike it gains life twice.",
+ related:["Double Strike","Combat Damage","Static Ability"], rule:"702.15"},
+
+{term:"Vigilance", cat:"keywords",
+ summary:"Attacking doesn't cause it to tap.",
+ how:"A creature with vigilance can be declared as an attacker without tapping.",
+ when:"During declare attackers.",
+ why:"It lets a creature attack and still block on the opponent's turn — offense and defense from one card.",
+ related:["Attacking","Blocking","Tap / Untap"], rule:"702.21"},
+
+{term:"Haste", cat:"keywords",
+ summary:"Ignores summoning sickness.",
+ how:"A creature with haste can attack and use {T}/{Q} abilities as soon as it comes under your control, even if it hasn't been yours since your turn began.",
+ when:"Immediately upon entering or changing control.",
+ why:"Haste denies opponents the usual turn to react to a new threat before it can act.",
+ related:["Summoning Sickness","Attacking"], rule:"702.10"},
+
+{term:"Menace", cat:"keywords",
+ summary:"Must be blocked by two or more creatures.",
+ how:"A creature with menace can't be blocked except by two or more creatures.",
+ when:"During declare blockers.",
+ why:"It's a soft evasion that punishes go-wide defense less than flying but still pushes damage through single blockers.",
+ related:["Flying","Blocking"], rule:"702.111"},
+
+{term:"Defender", cat:"keywords", alias:["wall"],
+ summary:"Can't attack.",
+ how:"A creature with defender can never be declared as an attacker (it can still block normally).",
+ when:"During declare attackers — it's simply ineligible.",
+ why:"Defender is the cost paid for cheap, high-toughness blockers ('walls').",
+ related:["Blocking","Attacking"], rule:"702.3"},
+
+{term:"Hexproof", cat:"keywords", alias:["hex proof"],
+ summary:"Can't be targeted by opponents.",
+ how:"A permanent or player with hexproof can't be the target of spells or abilities your <strong>opponents</strong> control. You can still target your own hexproof things.",
+ when:"Whenever an opponent tries to choose targets.",
+ why:"It dodges targeted removal while still letting you buff or protect it, unlike shroud.",
+ related:["Shroud","Ward","Protection","Target"], rule:"702.11"},
+
+{term:"Shroud", cat:"keywords",
+ summary:"Can't be targeted by anyone.",
+ how:"A permanent or player with shroud can't be the target of any spell or ability — including its own controller's.",
+ when:"Whenever targets are chosen.",
+ why:"Broader than hexproof but double-edged: you can't target it with your own protection or buffs either.",
+ related:["Hexproof","Ward","Target"], rule:"702.18"},
+
+{term:"Ward", cat:"keywords", alias:["ward cost"],
+ summary:"Opponents must pay extra to target it, or their spell is countered.",
+ how:"Ward is a triggered ability: whenever the permanent becomes the target of a spell or ability an <strong>opponent</strong> controls, counter it unless that player pays the ward cost (mana, life, discard, etc.).",
+ when:"On being targeted — it triggers and goes on the stack.",
+ why:"Unlike hexproof, ward still allows targeting; it just taxes it, which can be paid through. Because it's a trigger, it can theoretically be responded to.",
+ related:["Hexproof","Target","Triggered Ability"], rule:"702.21 (Ward)"},
+
+{term:"Protection", cat:"keywords", alias:["protection from","pro red","pro white"],
+ summary:"DEBT: can't be Damaged, Enchanted/Equipped, Blocked, or Targeted by the quality.",
+ how:"Protection from a quality (a color, type, etc.) means, from sources with that quality: <strong>D</strong>amage is prevented, <strong>E</strong>nchant/Equip can't attach, it can't be <strong>B</strong>locked by them, and it can't be <strong>T</strong>argeted by them.",
+ when:"Continuously, against anything with the named quality.",
+ why:"Protection is one of the strongest evasion/defense keywords because it covers four different interactions at once — but note it doesn't stop non-damage effects like −X/−X, sacrifice, or 'destroy' that don't target.",
+ related:["Hexproof","Indestructible","Blocking","Target"], rule:"702.16"},
+
+{term:"Indestructible", cat:"keywords", alias:["in destructible"],
+ summary:"Can't be destroyed by damage or 'destroy' effects.",
+ how:"An indestructible permanent isn't destroyed by lethal damage or by effects that say 'destroy.' State-based destruction from damage simply doesn't happen to it.",
+ when:"Continuously.",
+ why:"It answers most removal — but it still dies to sacrifice, to −X/−X reducing toughness to 0, to exile, and to 'put into graveyard' effects that don't 'destroy.'",
+ related:["Destroy","Exile","Deathtouch","State-Based Actions"], rule:"702.12"},
+
+{term:"Flash", cat:"keywords",
+ summary:"Cast it any time you could cast an instant.",
+ how:"Flash lets you cast that spell (a creature, artifact, etc.) at instant speed — on any player's turn, in response to things.",
+ when:"Any time you have priority.",
+ why:"Flash turns sorcery-speed permanents into reactive tools — ambush blockers, end-of-turn plays, and counterspell bait.",
+ related:["Instant","The Stack","Priority"], rule:"702.8"},
+
+{term:"Prowess", cat:"keywords",
+ summary:"+1/+1 until end of turn whenever you cast a noncreature spell.",
+ how:"A triggered ability: whenever its controller casts a noncreature spell, the creature gets +1/+1 until end of turn.",
+ when:"On casting a noncreature spell — it goes on the stack and can resolve before the spell.",
+ why:"Prowess rewards spell-heavy decks and can make combat math swing mid-turn, especially with instants during combat.",
+ related:["Triggered Ability","Instant","Sorcery"], rule:"702.108"},
+
+{term:"Convoke", cat:"keywords",
+ summary:"Tap creatures to help pay a spell's cost.",
+ how:"As you cast a spell with convoke, you may tap any number of untapped creatures. Each tapped creature pays for {1} or one mana of that creature's color.",
+ when:"While paying the spell's cost (during casting).",
+ why:"Convoke lets a board of creatures accelerate big spells, and tapping summoning-sick creatures is fine since it isn't a {T} ability.",
+ related:["Mana","Casting a Spell","Summoning Sickness"], rule:"702.51"},
+
+{term:"Connive", cat:"keywords", alias:["connives","connive n"],
+ summary:"Draw then discard; +1/+1 counter per nonland discarded.",
+ how:"Connive (or Connive N): the creature's controller draws that many cards, then discards that many. For each <strong>nonland</strong> card discarded this way, put a +1/+1 counter on the conniving creature.",
+ when:"When an effect says to connive (often on attack or on entering).",
+ why:"It filters your draws while growing a threat — a signature Grixis mechanic (e.g. Doctor Doom decks lean on it for card selection plus a bigger body).",
+ related:["Counters (+1/+1)","Discard","Draw Step"], rule:"702.164"},
+
+{term:"Flashback", cat:"keywords", alias:["flash back"],
+ summary:"Cast a spell from your graveyard, then exile it.",
+ how:"Flashback lets you cast that instant or sorcery from your graveyard by paying its flashback cost. As it resolves (or otherwise leaves the stack), it's exiled instead of returning to the graveyard.",
+ when:"At the spell's normal timing (instant vs sorcery) from the graveyard.",
+ why:"It gives a card a built-in second use, and the exile clause stops infinite recursion.",
+ related:["Graveyard","Exile","Instant","Sorcery"], rule:"702.34"},
+
+{term:"Cascade", cat:"keywords",
+ summary:"Cast this, then exile from the top until you hit a cheaper spell to cast free.",
+ how:"When you cast a spell with cascade, exile cards from the top of your library until you exile a nonland card with lesser mana value. You may cast that card without paying its mana cost. Then put the rest on the bottom in a random order.",
+ when:"A triggered ability that fires on casting the cascade spell (it resolves before the cascade spell does).",
+ why:"Cascade generates a free extra spell, rewarding decks with low, consistent mana values.",
+ related:["Mana Value","Exile","Triggered Ability"], rule:"702.85"},
+
+{term:"Cycling", cat:"keywords",
+ summary:"Pay a cost, discard the card, draw a card.",
+ how:"Cycling is an activated ability usable from your hand: pay the cycling cost and discard the card to draw a card.",
+ when:"Any time you could cast an instant (you have priority).",
+ why:"It makes otherwise-dead cards into card draw, smoothing draws late or early.",
+ related:["Discard","Draw Step","Activated Ability"], rule:"702.29"},
+
+{term:"Kicker", cat:"keywords", alias:["multikicker"],
+ summary:"An optional extra cost for a bonus effect.",
+ how:"You may pay the kicker cost in addition to a spell's mana cost as you cast it; if you do, the spell's 'if this was kicked' bonus applies.",
+ when:"Decided while casting, when you pay costs.",
+ why:"Kicker gives cards flexibility across the game — cheap early, more powerful when you have mana to spare.",
+ related:["Casting a Spell","Mana"], rule:"702.33"},
+
+{term:"Enchant", cat:"keywords",
+ summary:"Defines what an Aura can attach to.",
+ how:"An Aura's 'Enchant [something]' tells you what it can legally target when cast and stay attached to. If the thing it enchants becomes illegal or leaves, the Aura goes to the graveyard.",
+ when:"On cast (choosing a target) and continuously while attached.",
+ why:"It's the rule that ties an Aura's fate to its host.",
+ related:["Aura","State-Based Actions"], rule:"702.5"},
+
+{term:"Equip", cat:"keywords",
+ summary:"Activated ability that attaches Equipment to your creature.",
+ how:"'Equip [cost]' attaches the Equipment to a target creature you control. Moving it to a new creature costs the equip cost again.",
+ when:"Only at sorcery speed — your turn, empty stack.",
+ why:"The sorcery-speed limit stops you from re-equipping reactively during combat.",
+ related:["Equipment","Activated Ability","Main Phase"], rule:"702.6"},
+
+{term:"Crew", cat:"keywords",
+ summary:"Tap creatures with total power ≥ N to animate a Vehicle.",
+ how:"'Crew N' is an activated ability: tap any number of untapped creatures you control with total power N or greater to turn the Vehicle into an artifact creature until end of turn.",
+ when:"Any time you have priority (instant speed).",
+ why:"You can crew at instant speed to ambush-block, and tapping summoning-sick creatures to crew is fine.",
+ related:["Vehicle","Activated Ability","Summoning Sickness"], rule:"702.122"},
+
+{term:"Regenerate", cat:"keywords", alias:["regeneration","regen"],
+ summary:"A shield: the next destruction this turn is replaced.",
+ how:"'Regenerate' sets up a replacement shield. The next time the creature would be destroyed this turn, instead: tap it, remove it from combat, and remove all damage from it.",
+ when:"You set up the shield in advance; it applies when destruction would occur.",
+ why:"Regeneration saves against damage and 'destroy' — but not against exile, sacrifice, −X/−X to 0 toughness, or the legend rule, since those don't 'destroy.'",
+ related:["Destroy","Indestructible","Replacement Effect"], rule:"701.15"},
+
+/* ============ ACTIONS ============ */
+{term:"Scry", cat:"actions",
+ summary:"Look at the top card(s); keep on top or put on bottom.",
+ how:"Scry N: look at the top N cards of your library, put any number of them on the bottom in any order, and the rest back on top in any order.",
+ when:"When an effect tells you to scry.",
+ why:"Scry filters your next draws without spending cards — smoothing land/spell balance.",
+ related:["Surveil","Library","Draw Step"], rule:"701.18"},
+
+{term:"Surveil", cat:"actions",
+ summary:"Look at the top card(s); keep on top or put in graveyard.",
+ how:"Surveil N: look at the top N cards, put any number into your graveyard, and the rest back on top in any order.",
+ when:"When an effect tells you to surveil.",
+ why:"Like scry, but it feeds the graveyard — great for reanimation, flashback, and delve decks.",
+ related:["Scry","Graveyard","Mill"], rule:"701.44"},
+
+{term:"Mill", cat:"actions",
+ summary:"Put cards from the top of a library into the graveyard.",
+ how:"Mill N: that player puts the top N cards of their library into their graveyard.",
+ when:"When an effect says to mill.",
+ why:"Mill can be a win condition (emptying a library causes a loss on the next draw) or a way to fill graveyards for value.",
+ related:["Library","Graveyard","Surveil"], rule:"701.13"},
+
+{term:"Fight", cat:"actions",
+ summary:"Two creatures deal damage equal to their power to each other.",
+ how:"When two creatures fight, each deals damage equal to its power to the other, simultaneously. This isn't combat damage.",
+ when:"When an effect makes creatures fight.",
+ why:"Fight is green/removal-adjacent interaction; since it's not combat, first strike doesn't apply, but deathtouch and lifelink still do.",
+ related:["Deathtouch","Combat Damage","Power / Toughness"], rule:"701.12"},
+
+{term:"Destroy", cat:"actions",
+ summary:"Move a permanent to its owner's graveyard.",
+ how:"'Destroy' puts the permanent into its owner's graveyard. It can be stopped by indestructible or a regeneration shield.",
+ when:"When an effect says destroy, or as a state-based action when damage ≥ toughness.",
+ why:"It's the most common removal verb — which is why indestructible and regeneration are framed specifically against it.",
+ related:["Exile","Sacrifice","Indestructible","Regenerate"], rule:"701.7"},
+
+{term:"Sacrifice", cat:"actions", alias:["sac"],
+ summary:"You send your own permanent to the graveyard — unpreventable.",
+ how:"To sacrifice a permanent, move it from the battlefield to its owner's graveyard. You can only sacrifice things you control.",
+ when:"As a cost or an instruction from an effect.",
+ why:"Sacrifice can't be prevented, regenerated, or stopped by indestructible/hexproof — which is why 'sacrifice a creature' effects get around otherwise-protected threats.",
+ related:["Destroy","Indestructible","Graveyard"], rule:"701.17"},
+
+{term:"Exile (action)", cat:"actions", alias:["exile a card","exile it"],
+ summary:"Send a card to the exile zone — usually permanent.",
+ how:"To exile something is to move it to the exile zone. Unless an effect returns it, it's gone for good.",
+ when:"When an effect says to exile.",
+ why:"Exiling bypasses death triggers, regeneration, indestructible, and graveyard recursion, making it the cleanest form of removal.",
+ related:["Exile","Destroy","Indestructible"], rule:"701.10"},
+
+{term:"Discard", cat:"actions",
+ summary:"Move a card from hand to graveyard.",
+ how:"To discard is to put a card from your hand into your graveyard. You choose unless an effect specifies otherwise (e.g. an opponent chooses, or at random).",
+ when:"As a cost, an effect, or during cleanup if over hand size.",
+ why:"Discard is how hand disruption and 'madness'/graveyard synergies work — and why the cleanup hand-size rule matters.",
+ related:["Hand","Cleanup Step","Graveyard","Connive"], rule:"701.8"},
+
+{term:"Counter (a spell)", cat:"actions", alias:["counterspell","countered","counter target spell"],
+ summary:"Remove a spell/ability from the stack so it doesn't resolve.",
+ how:"To counter a spell or ability is to remove it from the stack; it doesn't resolve and (if a spell) goes to its owner's graveyard. This is unrelated to +1/+1 counters.",
+ when:"While the target is on the stack, before it resolves.",
+ why:"Countering is the purest form of interaction — stopping something before its effect ever happens. Note it can't stop abilities that don't use the stack (mana abilities, static abilities).",
+ related:["The Stack","Resolve","Instant","Mana Ability"], rule:"701.5"},
+
+{term:"Tap / Untap", cat:"actions", alias:["tap","untap","tapped"],
+ summary:"Turning a permanent sideways (tap) or upright (untap).",
+ how:"Tapping ({T}) turns a permanent sideways to show it's been used — for mana, attacking, or abilities. Untapping returns it upright.",
+ when:"You untap your permanents in your untap step; effects tap/untap at other times. A tapped creature can't attack or block.",
+ why:"Tap status is the on/off switch for most permanents' availability, so 'tap down' effects function as soft removal.",
+ related:["Untap Step","Vigilance","Summoning Sickness","Mana Ability"], rule:"701.21"},
+
+/* ============ COMMANDER ============ */
+{term:"Commander", cat:"commander", alias:["edh","commander format"],
+ summary:"Singleton 100-card format built around a legendary commander.",
+ how:"Each deck is exactly 100 cards, singleton (one of each card except basic lands), led by a legendary creature (or eligible card) as your commander. Players usually start at 40 life, often in multiplayer pods.",
+ when:"The commander starts in the command zone and can be cast from there.",
+ why:"The always-available commander plus singleton variety is what gives the format its signature swingy, social, big-play feel.",
+ related:["Command Zone","Color Identity","Command Tax","Commander Damage"], rule:"903"},
+
+{term:"Command Tax", cat:"commander", alias:["commander tax"],
+ summary:"Your commander costs {2} more each time you re-cast it from the command zone.",
+ how:"Each time your commander has been cast from the command zone before, it costs an additional {2} generic. Two prior casts = +{4}, and so on.",
+ when:"Applied when casting the commander from the command zone.",
+ why:"It stops you from endlessly recasting a commander that keeps getting removed, giving opponents a way to grind it down.",
+ related:["Command Zone","Commander"], rule:"903.8"},
+
+{term:"Color Identity", cat:"commander", alias:["color identity","ci"],
+ summary:"All colors in a card's cost and rules text — restricts your deck to your commander's colors.",
+ how:"A card's color identity is every color found in its mana cost, its color indicator, and any mana symbols in its rules text. Every card in a Commander deck must fall within its commander's color identity.",
+ when:"Checked during deck construction.",
+ why:"It's stricter than just a card's color — a colorless card that adds {R} in its text is red for identity purposes, so it can't go in a deck without red.",
+ related:["Commander","Mana","Color / Colorless"], rule:"903.4"},
+
+{term:"Commander Damage", cat:"commander", alias:["commander damage","21 damage"],
+ summary:"21 combat damage from a single commander eliminates a player.",
+ how:"A player who has been dealt 21 or more <strong>combat</strong> damage by the same commander over the course of the game loses. Damage from different commanders is tracked separately.",
+ when:"Tracked per source-commander, per player, cumulatively.",
+ why:"It's a built-in clock that makes big commanders a real threat even against high life totals — but only combat damage counts, not burn from the commander's abilities.",
+ related:["Commander","Combat Damage","Command Zone"], rule:"903.10"},
+
+{term:"Partner", cat:"commander",
+ summary:"Lets you run two commanders.",
+ how:"If a card says 'Partner,' you may have two commanders that each have Partner (or a matching 'Partner with' name). Their combined colors set your color identity.",
+ when:"Chosen during deck construction.",
+ why:"Partner widens color access and doubles your command-zone options, at the cost of a build-around requirement.",
+ related:["Commander","Color Identity","Command Zone"], rule:"702.124"},
+
+/* ============ FORMATS & DECKBUILDING ============ */
+{term:"Legend Rule", cat:"types", alias:["legend rule","legendary rule"],
+ summary:"You can't control two legendary permanents with the same name.",
+ how:"If you control two or more legendary permanents with the same name, choose one to keep and put the rest into their owners' graveyards. Planeswalkers use this same rule now (by name, not type).",
+ when:"Checked as a state-based action.",
+ why:"It keeps unique characters singular per player — note it's per <em>controller</em> and per <em>name</em>, so two different players can each have their own copy.",
+ related:["Legendary","Planeswalker","State-Based Actions","Commander"], rule:"704.5j"},
+
+{term:"Mana Value", cat:"formats", alias:["cmc","converted mana cost","mana value"],
+ summary:"The total amount of mana in a card's cost (formerly CMC).",
+ how:"A card's mana value is the sum of its mana symbols, counting each colored/generic pip and {X} as 0 while not on the stack. It ignores color — {2}{R}{R} has mana value 4.",
+ when:"Used by countless effects ('mana value 3 or less,' cascade, etc.).",
+ why:"It's the single number many effects key off, so knowing that color doesn't matter and {X}=0 outside the stack resolves most questions.",
+ related:["Mana","Cascade","Casting a Spell"], rule:"202.3"},
+
+{term:"Mulligan", cat:"formats", alias:["london mulligan","mull","free mulligan"],
+ summary:"Redraw a new hand, then bottom cards equal to mulligans taken.",
+ how:"Under the London mulligan: shuffle your hand back, draw seven, and for each mulligan you've taken, put that many cards from your hand on the bottom of your library. You decide to keep or mulligan before bottoming.",
+ when:"At the start of the game, before the first turn.",
+ why:"Drawing a fresh seven each time (and only paying by bottoming) makes it easier to find a workable opening hand while still costing card selection.",
+ related:["Hand","Library","Deck Construction"], rule:"103.4"},
+
+{term:"Deck Construction", cat:"formats", alias:["deck construction","deck rules","four copies","60 cards"],
+ summary:"Baseline deck-building limits differ by format.",
+ how:"Constructed decks are a minimum of 60 cards with at most 4 copies of any card (except basic lands). Limited (draft/sealed) decks are a minimum of 40 cards. Commander is exactly 100 cards, singleton.",
+ when:"Enforced during deck registration / construction.",
+ why:"The 4-copy limit and minimums shape consistency and variance across formats — Commander's singleton rule pushes it toward variety instead.",
+ related:["Commander","Mulligan","Color Identity"], rule:"100.2"},
+
+{term:"Color / Colorless", cat:"formats", alias:["colorless","color","wubrg colors"],
+ summary:"A card's color comes from its mana cost or color indicator — not its type.",
+ how:"An object is the color(s) of the mana symbols in its cost (or a color indicator). Cards with no colored mana symbols and no indicator are <strong>colorless</strong>, not a sixth color. Generic mana {1},{2} does not make a card colorless-colored.",
+ when:"Used by protection, color-matters effects, and color identity.",
+ why:"Distinguishing colorless from 'no color relevant' resolves interactions like protection from a color (which does nothing against colorless) and lets colorless cards slot into any deck.",
+ related:["Mana","Color Identity","Protection"], rule:"105"},
+
+{term:"Loyalty", cat:"types", alias:["loyalty counters","loyalty ability"],
+ summary:"A planeswalker's life total and ability fuel.",
+ how:"Planeswalkers enter with loyalty counters. Activating a loyalty ability adds or removes loyalty; you may use only one loyalty ability per planeswalker per turn, at sorcery speed. Combat damage to a planeswalker removes that much loyalty.",
+ when:"Loyalty abilities: your turn, empty stack, one per planeswalker.",
+ why:"Loyalty ties a planeswalker's power to its survivability — big 'ultimate' abilities require patiently building it up while opponents try to attack it down.",
+ related:["Planeswalker","Combat","Counters (+1/+1)"], rule:"606 / 306"}
+];
+
+/* -------- Cross-reference auto-linking -------- */
+// Phrases that are too common/ambiguous to auto-link (verbs, generic words,
+// and alias forms better reached via the explicit "See also" row).
+const BLOCK = new Set([
+ 'board','yard','bin','deck','in play','sac','walker','ci','eot','mull','regen',
+ 'swing','attack','attacker','blocker','block','wall','cast','casting',
+ 'who acts','passing priority','removed from game','rfg','superfriends',
+ 'mana pool','colorless mana','wubrg','death touch','life link','flash back',
+ 'hex proof','free mulligan','four copies','60 cards','deck rules',
+ 'minus counters','loyalty counter','loyalty counters','counter on permanent',
+ 'plus one counter','no color','damage step','attack step','block step',
+ 'end of turn','pro red','pro white','tap ability','activate','activating',
+ 'trigger','when whenever at','passive','token copy','gang block','double block','instead'
+]);
+
+// Build the phrase→entry map, longest phrases first so multi-word terms win
+// (e.g. "commander damage" links before the bare word "commander").
+const LINKS = (function(){
+  const map = new Map();
+  DATA.forEach(e=>{
+    [e.term, ...(e.alias||[])].forEach(p=>{
+      const lp = p.toLowerCase();
+      if(BLOCK.has(lp) || lp.length < 3) return;
+      if(/[()+\/]/.test(lp)) return;        // skip phrases with regex-hostile chars
+      if(!map.has(lp)) map.set(lp, e.term); // first entry to claim a phrase keeps it
+    });
+  });
+  return [...map.entries()]
+    .sort((a,b)=> b[0].length - a[0].length)
+    .map(([phrase,target])=>({
+      phrase,
+      target,
+      head: new RegExp('^'+phrase.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'s?\\b','i')
+    }));
+})();
+
+// Left-to-right scan: at each position, link the longest still-unused term.
+function autoLink(text, used){
+  let out='', i=0;
+  while(i < text.length){
+    let hit=null;
+    for(const lk of LINKS){
+      if(used.has(lk.target.toLowerCase())) continue;
+      // require a word boundary before the phrase
+      if(i>0 && /\w/.test(text[i-1]) && /\w/.test(lk.phrase[0])) continue;
+      const m = lk.head.exec(text.slice(i));
+      if(m){ hit={lk, len:m[0].length}; break; }
+    }
+    if(hit){
+      const seg = text.substr(i, hit.len);
+      const t = hit.lk.target.replace(/'/g,"\\'");
+      out += `<a class="xref" onclick="event.stopPropagation();__jump('${t}')">${seg}</a>`;
+      used.add(hit.lk.target.toLowerCase());
+      i += hit.len;
+    } else { out += text[i]; i++; }
+  }
+  return out;
+}
+
+// Add cross-links (skipping the entry's own term), then apply search highlight.
+function decorate(html, selfTerm, q){
+  const used = new Set([selfTerm.toLowerCase()]);
+  const parts = html.split(/(<[^>]+>)/);
+  for(let i=0;i<parts.length;i++){
+    if(!parts[i].startsWith('<')) parts[i] = autoLink(parts[i], used);
+  }
+  return highlight(parts.join(''), q);
+}
+
+/* ---------------- App ---------------- */
+const results = document.getElementById('results');
+const search = document.getElementById('search');
+const countEl = document.getElementById('count');
+const chipsEl = document.getElementById('chips');
+const clearBtn = document.getElementById('clear');
+
+let activeCat = null;
+
+// Build chips
+Object.entries(CATS).forEach(([key,c])=>{
+  const chip=document.createElement('button');
+  chip.className='chip';
+  chip.dataset.cat=key;
+  chip.innerHTML=`<span class="dot" style="background:${c.color}"></span>${c.label}`;
+  chip.addEventListener('click',()=>{
+    activeCat = activeCat===key ? null : key;
+    document.querySelectorAll('.chip').forEach(ch=>{
+      const on = ch.dataset.cat===activeCat;
+      ch.classList.toggle('active',on);
+      ch.style.background = on ? CATS[ch.dataset.cat].color : '';
+      ch.style.borderColor = on ? CATS[ch.dataset.cat].color : '';
+    });
+    render();
+  });
+  chipsEl.appendChild(chip);
+});
+
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function scoreEntry(e,q){
+  const term=e.term.toLowerCase();
+  const aliases=(e.alias||[]).map(a=>a.toLowerCase());
+  if(term===q) return 100;
+  if(term.startsWith(q)) return 80;
+  if(aliases.some(a=>a===q)) return 75;
+  if(aliases.some(a=>a.startsWith(q))) return 60;
+  if(term.includes(q)) return 50;
+  if(aliases.some(a=>a.includes(q))) return 40;
+  const body=(e.summary+' '+(e.how||'')+' '+(e.when||'')+' '+(e.why||'')).toLowerCase();
+  if(body.includes(q)) return 20;
+  if(CATS[e.cat].label.toLowerCase().includes(q)) return 10;
+  return 0;
+}
+
+function highlight(text,q){
+  if(!q) return text;
+  // highlight only outside of HTML tags
+  const parts=text.split(/(<[^>]+>)/);
+  const rx=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');
+  return parts.map(p=> p.startsWith('<') ? p : p.replace(rx,'<mark>$1</mark>')).join('');
+}
+
+function jump(term){
+  search.value=term;
+  activeCat=null;
+  document.querySelectorAll('.chip').forEach(ch=>{ch.classList.remove('active');ch.style.background='';ch.style.borderColor='';});
+  render(true);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+window.__jump=jump;
+
+function render(forceOpenFirst){
+  const q=search.value.trim().toLowerCase();
+  clearBtn.classList.toggle('show', !!search.value);
+
+  let list=DATA.map(e=>({e,s:q?scoreEntry(e,q):1}))
+               .filter(x=> (q? x.s>0 : true) && (activeCat? x.e.cat===activeCat : true));
+
+  if(q) list.sort((a,b)=> b.s-a.s || a.e.term.localeCompare(b.e.term));
+  else list.sort((a,b)=> a.e.term.localeCompare(b.e.term));
+
+  const n=list.length;
+  countEl.textContent = q||activeCat
+    ? `${n} ${n===1?'entry':'entries'}${activeCat?' · '+CATS[activeCat].label:''}`
+    : `${DATA.length} entries · type to search or pick a category`;
+
+  if(n===0){
+    results.innerHTML=`<div class="empty"><div class="big">No entry for "${esc(search.value)}"</div>Try a broader term, or ask me directly about the interaction — I can rule on card-specific cases this reference doesn't cover.</div>`;
+    return;
+  }
+
+  const openFirst = !!q || forceOpenFirst;
+  results.innerHTML = list.map((x,i)=>{
+    const e=x.e; const c=CATS[e.cat];
+    const open = openFirst && i===0;
+    const fields=[];
+    if(e.how) fields.push(['How it works',e.how]);
+    if(e.when) fields.push(['When it applies',e.when]);
+    if(e.why) fields.push(['Why it matters',e.why]);
+    const fieldHtml=fields.map(([l,b])=>`<div class="field"><div class="field-label">${l}</div><div class="field-body">${decorate(b,e.term,q)}</div></div>`).join('');
+    const related=(e.related||[]).map(r=>`<a onclick="__jump('${r.replace(/'/g,"\\'")}')">${esc(r)}</a>`).join(' · ');
+    const meta=`<div class="meta">${e.rule?`<span class="rule-ref"><b>Rules section:</b> ${esc(e.rule)}</span>`:''}${related?`<span class="related">See also: ${related}</span>`:''}</div>`;
+    return `<div class="entry ${open?'open':''}" style="border-left-color:${c.color}">
+      <div class="entry-head" onclick="this.parentNode.classList.toggle('open')">
+        <span class="term">${highlight(esc(e.term),q)}</span>
+        <span class="cat-tag" style="color:${c.color}">${c.label}</span>
+        <span class="summary">${highlight(e.summary,q)}</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="entry-body">${fieldHtml}${meta}</div>
+    </div>`;
+  }).join('');
+}
+
+search.addEventListener('input',()=>render());
+clearBtn.addEventListener('click',()=>{search.value='';activeCat=null;document.querySelectorAll('.chip').forEach(ch=>{ch.classList.remove('active');ch.style.background='';ch.style.borderColor='';});render();search.focus();});
+search.addEventListener('keydown',e=>{ if(e.key==='Escape'){search.value='';render();} });
+
+render();
+search.focus();
+</script>
+</body>
+</html>
